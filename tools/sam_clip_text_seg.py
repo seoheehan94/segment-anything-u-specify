@@ -70,19 +70,9 @@ def main():
     segmentor = build_sam_clip_text_ins_segmentor(cfg=insseg_cfg)
     LOG.info('Segmentor initialized complete')
     LOG.info('Start to segment input image ...')
-    
-    # Re-load the clean image
-    raw_image = cv2.imread(input_image_path)
-
-    # Run segmentation
     ret = segmentor.seg_image(input_image_path, unique_label=unique_labels, use_text_prefix=use_text_prefix)
-    
-    # Resize the raw image to match mask shape
-    target_h, target_w = ret['ins_seg_mask'].shape[:2]
-    raw_image_resized = cv2.resize(raw_image, (target_w, target_h), interpolation=cv2.INTER_LINEAR)
-    ret['source'] = raw_image_resized  # override source
-
     LOG.info('segment complete')
+    
 
     # save cluster result
     save_dir = args.save_dir
@@ -108,11 +98,7 @@ def main():
     mask_2d = cv2.threshold(mask_gray, 127, 1, cv2.THRESH_BINARY)[1]
     binary_mask = np.expand_dims(mask_2d, axis=2)  # → (H, W, 1)
 
-    print("ret['source'] shape:", ret['source'].shape)
-    print("gray_bg shape:", gray_bg.shape)
-    print("mask_2d shape:", mask_2d.shape)
-    print("binary_mask shape:", binary_mask.shape)
-    print("Mask unique values after thresholding:", np.unique(mask_2d))
+    print("Returned keys from segmentation:", ret.keys())
 
     
     # Composite: keep foreground where mask==1, else gray background
