@@ -93,6 +93,10 @@ def main():
     mask_2d = cv2.threshold(ret['ins_seg_mask'], 127, 1, cv2.THRESH_BINARY)[1]  # (H, W)
     binary_mask = np.expand_dims(mask_2d, axis=2)  # → (H, W, 1)
 
+    print("ret['source'] shape:", ret['source'].shape)
+    print("gray_bg shape:", gray_bg.shape)
+    print("binary_mask shape:", binary_mask.shape)
+    
     # Composite: keep foreground where mask==1, else gray background
     composite_image = ret['source'] * binary_mask + gray_bg * (1 - binary_mask)
     composite_image = composite_image.astype(np.uint8)
