@@ -180,9 +180,6 @@ class SamClipInsSegmentor(object):
             # extract mask from sam model
             masks = self._generate_sam_mask(input_image)
 
-            print(masks)
-
-
             # Convert list of binary torch tensors to a single numpy mask (union of all masks)
             raw_mask_np = None
             for m in masks['segmentations']:
