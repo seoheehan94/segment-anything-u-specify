@@ -97,6 +97,10 @@ def main():
 
     # Ensure mask is uint8
     binary_mask = binary_mask.astype(np.uint8)
+    
+    print("ret['source'] shape:", ret['source'].shape)
+    print("gray_bg shape:", gray_bg.shape)
+    print("binary_mask shape:", binary_mask.shape)
 
     # Apply the mask: keep foreground from source, background from gray
     composite_image = ret['source'] * binary_mask + gray_bg * (1 - binary_mask)
