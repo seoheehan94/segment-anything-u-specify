@@ -86,17 +86,27 @@ def main():
     
 
     # === NEW: Save object on gray background ===
-    gray_bg = np.full_like(ret['source'], fill_value=128)  # light gray background in BGR
-    binary_mask = cv2.threshold(ret['ins_seg_mask'], 127, 1, cv2.THRESH_BINARY)[1]
-    binary_mask = binary_mask[:, :, np.newaxis]  # shape = (H, W, 1)
+    # Create gray background same size as original image
+   gray_bg = np.full_like(ret['source'], fill_value=128)  # BGR gray
+   
+   # Get binary mask from grayscale (ins_seg_mask is 2D)
+   binary_mask = cv2.threshold(ret['ins_seg_mask'], 127, 1, cv2.THRESH_BINARY)[1]  # shape (H, W)
 
-    composite_image = ret['source'] * binary_mask + gray_bg * (1 - binary_mask)
-    composite_image = composite_image.astype(np.uint8)
+   # Expand to (H, W, 1) and then broadcast to (H, W, 3)
+   binary_mask = binary_mask[:, :, np.newaxis]  # shape (H, W, 1)
 
-    gray_output_path = ops.join(save_dir, '{:s}_object_on_gray.png'.format(input_image_name.split('.')[0]))
-    cv2.imwrite(gray_output_path, composite_image)
+   # Ensure mask is uint8
+   binary_mask = binary_mask.astype(np.uint8)
 
-    LOG.info(f'Saved object-on-gray image to: {gray_output_path}')
+   # Apply the mask: keep foreground from source, background from gray
+   composite_image = ret['source'] * binary_mask + gray_bg * (1 - binary_mask)
+   composite_image = composite_image.astype(np.uint8)
+
+   # Save
+   gray_output_path = ops.join(save_dir, '{:s}_object_on_gray.png'.format(input_image_name.split('.')[0]))
+   cv2.imwrite(gray_output_path, composite_image)
+
+   LOG.info(f'Saved object-on-gray image to: {gray_output_path}')
 
     return
 
