@@ -70,7 +70,12 @@ def main():
     segmentor = build_sam_clip_text_ins_segmentor(cfg=insseg_cfg)
     LOG.info('Segmentor initialized complete')
     LOG.info('Start to segment input image ...')
+    # Re-load the clean image
+    raw_image = cv2.imread(input_image_path)
+
+    # Run segmentation
     ret = segmentor.seg_image(input_image_path, unique_label=unique_labels, use_text_prefix=use_text_prefix)
+    ret['source'] = raw_image  # manually override the possibly annotated image
     LOG.info('segment complete')
 
     # save cluster result
