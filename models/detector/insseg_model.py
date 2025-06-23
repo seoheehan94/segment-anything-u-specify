@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2023-04-11 下午1:49
 # @Author  : MaybeShewill-CV
-# @Site    :  
+# @Site    :
 # @File    : insseg_model.py
 # @IDE: PyCharm Community Edition
 """
@@ -23,6 +23,7 @@ class SamClipInsSegmentor(object):
     """
 
     """
+
     def __init__(self, sam_cfg, clip_cfg, insseg_cfg):
         """
 
@@ -37,7 +38,8 @@ class SamClipInsSegmentor(object):
         self.cls_score_thresh = insseg_cfg.INS_SEG.CLS_SCORE_THRESH
         self.max_input_size = insseg_cfg.INS_SEG.MAX_INPUT_SIZE
         self.obj365_text_prompts = utils.generate_object365_text_prompts()
-        self.obj365_text_token = tokenize(self.obj365_text_prompts).to(self.device)
+        self.obj365_text_token = tokenize(
+            self.obj365_text_prompts).to(self.device)
         self.text_token = None
 
     def _set_text_tokens(self, texts):
@@ -76,7 +78,8 @@ class SamClipInsSegmentor(object):
         """
         y, x = np.where(seg_mask == 1)
         fg_pts = np.vstack((x, y)).transpose()
-        src_image = cv2.bitwise_or(input_image, input_image, mask=np.asarray(seg_mask, dtype=np.uint8))
+        src_image = cv2.bitwise_or(
+            input_image, input_image, mask=np.asarray(seg_mask, dtype=np.uint8))
         roi_x, roi_y, roi_w, roi_h = cv2.boundingRect(fg_pts)
         extend_size = 20
         if roi_x - extend_size >= 0:
@@ -99,13 +102,16 @@ class SamClipInsSegmentor(object):
         image = Image.fromarray(input_image)
         image = self.clip_preprocess(image).unsqueeze(0).to(self.device)
         if text is None:
-            logits_per_image, logits_per_text = self.clip_model(image, self.obj365_text_token)
+            logits_per_image, logits_per_text = self.clip_model(
+                image, self.obj365_text_token)
         else:
             if self.text_token is None:
                 text_token = tokenize(texts=text).to(self.device)
-                logits_per_image, logits_per_text = self.clip_model(image, text_token)
+                logits_per_image, logits_per_text = self.clip_model(
+                    image, text_token)
             else:
-                logits_per_image, logits_per_text = self.clip_model(image, self.text_token)
+                logits_per_image, logits_per_text = self.clip_model(
+                    image, self.text_token)
         probs = logits_per_image.softmax(dim=-1).cpu().numpy()[0, :]
         cls_id = np.argmax(probs)
         score = probs[cls_id]
@@ -127,7 +133,8 @@ class SamClipInsSegmentor(object):
         """
         bboxes_cls_names = []
         for idx, bbox in enumerate(mask['bboxes']):
-            roi_image = self._crop_rotate_image_roi(input_image, mask['segmentations'][idx])
+            roi_image = self._crop_rotate_image_roi(
+                input_image, mask['segmentations'][idx])
             if roi_image is None:
                 cls_name = 'background'
                 bboxes_cls_names.append(cls_name)
@@ -135,7 +142,8 @@ class SamClipInsSegmentor(object):
             # cv2.imwrite('{:d}_mask.png'.format(idx), roi_image[:, :, (2, 1, 0)])
             cls_id = self._classify_image(roi_image, text=text)
             if text is None:
-                cls_name = self.obj365_text_prompts[cls_id].split('a photo of')[1].strip(' ')
+                cls_name = self.obj365_text_prompts[cls_id].split('a photo of')[
+                    1].strip(' ')
                 bboxes_cls_names.append(cls_name)
             else:
                 cls_name = text[cls_id]
@@ -160,25 +168,29 @@ class SamClipInsSegmentor(object):
             h, w, _ = input_image.shape
             hw_ratio = h / w if h > w else w / h
             if h > w:
-                dsize = (int(self.max_input_size[1] / hw_ratio), self.max_input_size[1])
+                dsize = (
+                    int(self.max_input_size[1] / hw_ratio), self.max_input_size[1])
             else:
-                dsize = (self.max_input_size[0], int(self.max_input_size[0] / hw_ratio))
+                dsize = (self.max_input_size[0], int(
+                    self.max_input_size[0] / hw_ratio))
             input_image = cv2.resize(input_image, dsize=dsize)
         input_image = cv2.cvtColor(input_image, cv2.COLOR_BGR2RGB)
 
         with torch.no_grad():
             # extract mask from sam model
             masks = self._generate_sam_mask(input_image)
-            
+
             # Convert list of binary torch tensors to a single numpy mask (union of all masks)
-	    raw_mask_np = None
-	    for m in masks:
-    	    	m_np = m['segmentation'].astype(np.uint8)  # Each m is a dict with 'segmentation' key
-    	        if raw_mask_np is None:
-        		raw_mask_np = m_np
-    		else:
-        		raw_mask_np = np.logical_or(raw_mask_np, m_np).astype(np.uint8)
-        	
+            raw_mask_np = None
+            for m in masks:
+                # Each m is a dict with 'segmentation' key
+                m_np = m['segmentation'].astype(np.uint8)
+                if raw_mask_np is None:
+                    raw_mask_np = m_np
+                else:
+                    raw_mask_np = np.logical_or(
+                        raw_mask_np, m_np).astype(np.uint8)
+
             # classify each mask's label
             if unique_label is None:
                 self._classify_mask(input_image, masks, text=None)
@@ -192,7 +204,8 @@ class SamClipInsSegmentor(object):
 
         # visualize segmentation result
         input_image = cv2.cvtColor(input_image, cv2.COLOR_RGB2BGR)
-        ins_seg_mask = utils.visualize_instance_seg_results(masks, draw_bbox=True)
+        ins_seg_mask = utils.visualize_instance_seg_results(
+            masks, draw_bbox=True)
         ins_seg_add = cv2.addWeighted(input_image, 0.5, ins_seg_mask, 0.5, 0.0)
 
         ret = {
