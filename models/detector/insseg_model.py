@@ -185,14 +185,12 @@ class SamClipInsSegmentor(object):
 
             # Convert list of binary torch tensors to a single numpy mask (union of all masks)
             raw_mask_np = None
-            for m in masks:
-                # Each m is a dict with 'segmentation' key
-                m_np = m['segmentation'].astype(np.uint8)
+            for m in masks['segmentations']:
+                m_np = m.astype(np.uint8)
                 if raw_mask_np is None:
                     raw_mask_np = m_np
                 else:
-                    raw_mask_np = np.logical_or(
-                        raw_mask_np, m_np).astype(np.uint8)
+                    raw_mask_np = np.logical_or(raw_mask_np, m_np).astype(np.uint8)
 
             # classify each mask's label
             if unique_label is None:

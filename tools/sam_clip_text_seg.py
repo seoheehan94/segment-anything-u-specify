@@ -89,7 +89,7 @@ def main():
     # === NEW: Save object on gray background ===
     # Create gray background same size as original image
     mask_2d = ret['raw_mask'].astype(np.uint8)  # shape (H, W)
-    binary_mask = np.expand_dims(mask_2d, axis=2)  # shape (H, W, 1)
+    binary_mask = np.stack([mask_2d]*3, axis=2)  # shape (H, W, 3)
     gray_bg = np.full_like(ret['source'], fill_value=128)
     
     # Composite: keep foreground where mask==1, else gray background
