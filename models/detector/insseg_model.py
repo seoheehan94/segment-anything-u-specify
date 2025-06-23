@@ -169,6 +169,16 @@ class SamClipInsSegmentor(object):
         with torch.no_grad():
             # extract mask from sam model
             masks = self._generate_sam_mask(input_image)
+            
+            # Convert list of binary torch tensors to a single numpy mask (union of all masks)
+	    raw_mask_np = None
+	    for m in masks:
+    	    	m_np = m['segmentation'].astype(np.uint8)  # Each m is a dict with 'segmentation' key
+    	        if raw_mask_np is None:
+        		raw_mask_np = m_np
+    		else:
+        		raw_mask_np = np.logical_or(raw_mask_np, m_np).astype(np.uint8)
+        	
             # classify each mask's label
             if unique_label is None:
                 self._classify_mask(input_image, masks, text=None)
@@ -188,7 +198,8 @@ class SamClipInsSegmentor(object):
         ret = {
             'source': input_image,
             'ins_seg_mask': ins_seg_mask,
-            'ins_seg_add': ins_seg_add
+            'ins_seg_add': ins_seg_add,
+            'raw_mask': raw_mask_np
         }
 
         return ret

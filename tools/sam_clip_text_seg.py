@@ -88,18 +88,9 @@ def main():
 
     # === NEW: Save object on gray background ===
     # Create gray background same size as original image
-    gray_bg = np.full_like(ret['source'], fill_value=128)  # gray RGB
-    if ret['ins_seg_mask'].ndim == 3:
-    	mask_gray = cv2.cvtColor(ret['ins_seg_mask'], cv2.COLOR_BGR2GRAY)
-    else:
-    	mask_gray = ret['ins_seg_mask']
-
-    # Threshold mask and ensure shape = (H, W, 1)
-    mask_2d = cv2.threshold(mask_gray, 127, 1, cv2.THRESH_BINARY)[1]
-    binary_mask = np.expand_dims(mask_2d, axis=2)  # → (H, W, 1)
-
-    print("Returned keys from segmentation:", ret.keys())
-
+    mask_2d = ret['raw_mask'].astype(np.uint8)  # shape (H, W)
+    binary_mask = np.expand_dims(mask_2d, axis=2)  # shape (H, W, 1)
+    gray_bg = np.full_like(ret['source'], fill_value=128)
     
     # Composite: keep foreground where mask==1, else gray background
     composite_image = ret['source'] * binary_mask + gray_bg * (1 - binary_mask)
