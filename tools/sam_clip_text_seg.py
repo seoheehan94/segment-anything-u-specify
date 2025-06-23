@@ -95,6 +95,7 @@ def main():
 
     print("ret['source'] shape:", ret['source'].shape)
     print("gray_bg shape:", gray_bg.shape)
+    print("mask_2d shape:", mask_2d.shape)
     print("binary_mask shape:", binary_mask.shape)
     
     # Composite: keep foreground where mask==1, else gray background
