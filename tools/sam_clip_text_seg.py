@@ -80,7 +80,7 @@ def main():
     ori_image_save_path = ops.join(save_dir, input_image_name)
     cv2.imwrite(ori_image_save_path, ret['source'])
     mask_save_path = ops.join(save_dir, '{:s}_insseg_mask.png'.format(input_image_name.split('.')[0]))
-    cv2.imwrite(mask_save_path, ret['ins_seg_mask'])
+    cv2.imwrite(mask_save_path, ret['ins_seg_mask2'])
     mask_add_save_path = ops.join(save_dir, '{:s}_insseg_add.png'.format(input_image_name.split('.')[0]))
     cv2.imwrite(mask_add_save_path, ret['ins_seg_add'])
     

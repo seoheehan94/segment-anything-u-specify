@@ -204,11 +204,14 @@ class SamClipInsSegmentor(object):
         input_image = cv2.cvtColor(input_image, cv2.COLOR_RGB2BGR)
         ins_seg_mask = utils.visualize_instance_seg_results(
             masks, draw_bbox=True)
+        ins_seg_mask2 = utils.visualize_instance_seg_results(
+            masks, draw_bbox=False)
         ins_seg_add = cv2.addWeighted(input_image, 0.5, ins_seg_mask, 0.5, 0.0)
 
         ret = {
             'source': input_image,
             'ins_seg_mask': ins_seg_mask,
+            'ins_seg_mask2': ins_seg_mask2,
             'ins_seg_add': ins_seg_add,
             'raw_mask': raw_mask_np
         }
