@@ -96,7 +96,7 @@ def main():
     gray_bg = np.full_like(ret['source'], fill_value=128)
 
     # Composite: keep foreground where mask==1, else gray background
-    composite_image = ret['source'] * binary_mask + gray_bg * (1 - binary_mask)
+    composite_image = ret['source'] * binary_mask + gray_bg * (binary_mask)
     composite_image = composite_image.astype(np.uint8)
 
     # Save
