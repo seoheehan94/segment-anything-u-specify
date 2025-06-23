@@ -89,9 +89,12 @@ def main():
     # === NEW: Save object on gray background ===
     # Create gray background same size as original image
     mask_2d = ret['ins_seg_mask2'].astype(np.uint8)  # shape (H, W)
-    binary_mask = np.stack([mask_2d]*3, axis=2)  # shape (H, W, 3)
+    if mask_2d.ndim == 2:
+        binary_mask = np.stack([mask_2d]*3, axis=2)
+    else:
+        binary_mask = mask_2d  # Already 3D
     gray_bg = np.full_like(ret['source'], fill_value=128)
-    
+
     # Composite: keep foreground where mask==1, else gray background
     composite_image = ret['source'] * binary_mask + gray_bg * (1 - binary_mask)
     composite_image = composite_image.astype(np.uint8)
