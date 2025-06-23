@@ -87,22 +87,13 @@ def main():
 
     # === NEW: Save object on gray background ===
     # Create gray background same size as original image
-    gray_bg = np.full_like(ret['source'], fill_value=128)  # BGR gray
-   
-    # Get binary mask from grayscale (ins_seg_mask is 2D)
-    binary_mask = cv2.threshold(ret['ins_seg_mask'], 127, 1, cv2.THRESH_BINARY)[1]  # shape (H, W)
+    gray_bg = np.full_like(ret['source'], fill_value=128)  # gray RGB
 
-    # Expand to (H, W, 1) and then broadcast to (H, W, 3)
-    binary_mask = binary_mask[:, :, np.newaxis]  # shape (H, W, 1)
+    # Threshold mask and ensure shape = (H, W, 1)
+    mask_2d = cv2.threshold(ret['ins_seg_mask'], 127, 1, cv2.THRESH_BINARY)[1]  # (H, W)
+    binary_mask = np.expand_dims(mask_2d, axis=2)  # → (H, W, 1)
 
-    # Ensure mask is uint8
-    binary_mask = binary_mask.astype(np.uint8)
-    
-    print("ret['source'] shape:", ret['source'].shape)
-    print("gray_bg shape:", gray_bg.shape)
-    print("binary_mask shape:", binary_mask.shape)
-
-    # Apply the mask: keep foreground from source, background from gray
+    # Composite: keep foreground where mask==1, else gray background
     composite_image = ret['source'] * binary_mask + gray_bg * (1 - binary_mask)
     composite_image = composite_image.astype(np.uint8)
 
