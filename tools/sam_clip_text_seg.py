@@ -112,6 +112,8 @@ def main():
     print("gray_bg shape:", gray_bg.shape)
     print("mask_2d shape:", mask_2d.shape)
     print("binary_mask shape:", binary_mask.shape)
+    print("Mask unique values after thresholding:", np.unique(mask_2d))
+
     
     # Composite: keep foreground where mask==1, else gray background
     composite_image = ret['source'] * binary_mask + gray_bg * (1 - binary_mask)
