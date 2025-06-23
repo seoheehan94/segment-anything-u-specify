@@ -18,7 +18,9 @@ from local_utils.log_util import init_logger
 from local_utils.config_utils import parse_config_utils
 from models import build_sam_clip_text_ins_segmentor
 
-
+from PIL import Image
+import numpy as np
+    
 LOG = init_logger.get_logger('instance_seg.log')
 
 
@@ -80,8 +82,19 @@ def main():
     cv2.imwrite(mask_save_path, ret['ins_seg_mask'])
     mask_add_save_path = ops.join(save_dir, '{:s}_insseg_add.png'.format(input_image_name.split('.')[0]))
     cv2.imwrite(mask_add_save_path, ret['ins_seg_add'])
+    
+    
 
-    LOG.info('save segment and cluster result into {:s}'.format(save_dir))
+    # === NEW: Save object on gray background ===
+    gray_bg = np.full_like(ret['source'], fill_value=128)  # light gray background in BGR
+    binary_mask = cv2.threshold(ret['ins_seg_mask'], 127, 1, cv2.THRESH_BINARY)[1][:, :, np.newaxis]
+    composite_image = ret['source'] * binary_mask + gray_bg * (1 - binary_mask)
+    composite_image = composite_image.astype(np.uint8)
+
+    gray_output_path = ops.join(save_dir, '{:s}_object_on_gray.png'.format(input_image_name.split('.')[0]))
+    cv2.imwrite(gray_output_path, composite_image)
+
+    LOG.info(f'Saved object-on-gray image to: {gray_output_path}')
 
     return
 
