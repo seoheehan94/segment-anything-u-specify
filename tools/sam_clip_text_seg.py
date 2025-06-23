@@ -87,7 +87,9 @@ def main():
 
     # === NEW: Save object on gray background ===
     gray_bg = np.full_like(ret['source'], fill_value=128)  # light gray background in BGR
-    binary_mask = cv2.threshold(ret['ins_seg_mask'], 127, 1, cv2.THRESH_BINARY)[1][:, :, np.newaxis]
+    binary_mask = cv2.threshold(ret['ins_seg_mask'], 127, 1, cv2.THRESH_BINARY)[1]
+    binary_mask = binary_mask[:, :, np.newaxis]  # shape = (H, W, 1)
+
     composite_image = ret['source'] * binary_mask + gray_bg * (1 - binary_mask)
     composite_image = composite_image.astype(np.uint8)
 
