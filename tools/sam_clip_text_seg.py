@@ -34,7 +34,7 @@ def init_args():
     parser.add_argument('--insseg_cfg_path', type=str, default='./config/insseg.yaml')
     parser.add_argument('--text', type=str, default=None)
     parser.add_argument('--cls_score_thresh', type=float, default=None)
-    parser.add_argument('--save_dir', type=str, default='/bwlab/Users/SeoheeHan/Curvature/THINGS/new_seg')
+    parser.add_argument('--save_dir', type=str, default='/bwdata/THINGS_segmented')
     parser.add_argument('--use_text_prefix', action='store_true')
 
     return parser.parse_args()
