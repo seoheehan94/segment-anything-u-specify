@@ -93,7 +93,6 @@ def main():
         binary_mask = np.stack([mask_2d]*3, axis=2)
     else:
         binary_mask = mask_2d  # Already 3D
-
     binary_mask = 1 - binary_mask
 
     gray_bg = np.full_like(ret['source'], fill_value=128)
@@ -107,6 +106,21 @@ def main():
     cv2.imwrite(gray_output_path, composite_image)
 
     LOG.info(f'Saved object-on-gray image to: {gray_output_path}')
+
+    # Apply mask to source image to keep only the foreground
+    foreground = ret['source'] * binary_mask  # (H, W, 3)
+
+    # Create alpha channel: 255 where mask==1, else 0
+    alpha = (mask_2d * 255).astype(np.uint8)  # shape (H, W)
+
+    # Combine RGB and alpha into RGBA
+    rgba_image = np.dstack((foreground, alpha))  # shape (H, W, 4)
+
+    # Save as PNG with transparency
+    transparent_output_path = ops.join(save_dir, '{:s}_object_transparent.png'.format(input_image_name.split('.')[0]))
+    cv2.imwrite(transparent_output_path, rgba_image)
+
+    LOG.info(f'Saved transparent image to: {transparent_output_path}')
 
     return
 
