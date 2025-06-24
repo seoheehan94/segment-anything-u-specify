@@ -107,19 +107,17 @@ def main():
 
     LOG.info(f'Saved object-on-gray image to: {gray_output_path}')
 
+    # === NEW: Save object on transparent background ===
     # Ensure image and mask are both uint8
-    mask_2d = (ret['ins_seg_mask2'] == 1).astype(np.uint8)
-    # Expand to 3 channels if needed
-    if mask_2d.ndim == 2:
-        binary_mask = np.stack([mask_2d]*3, axis=2)  # (H, W, 3)
-    else:
-        binary_mask = mask_2d  # (H, W, 3)
+    mask_2d = ret['ins_seg_mask2']
+    if mask_2d.ndim == 3:
+        mask_2d = mask_2d[:, :, 0]  # take only one channel
+    mask_2d = (mask_2d == 1).astype(np.uint8)  # (H, W)
+    
+    binary_mask = np.stack([mask_2d]*3, axis=2)  # (H, W, 3)
 
     # Ensure image and mask are both uint8
     source = ret['source'].astype(np.uint8)
-    binary_mask = binary_mask.astype(np.uint8)
-
-    # Mask the RGB image
     foreground = source * binary_mask  # (H, W, 3)
 
     # Create alpha channel: 255 where mask==1, else 0
@@ -128,14 +126,7 @@ def main():
     # Combine RGB and alpha into RGBA
     rgba_image = np.dstack((foreground, alpha))  # shape (H, W, 4)
 
-    print("source shape:", source.shape)
-    print("mask_2d shape:", mask_2d.shape)
-    print("binary_mask shape:", binary_mask.shape)
-    print("foreground shape:", foreground.shape)
-    print("alpha shape:", alpha.shape)
     print("rgba_image shape:", rgba_image.shape)
-
-
 
     # Save as PNG with transparency
     transparent_output_path = ops.join(save_dir, '{:s}_object_transparent.png'.format(input_image_name.split('.')[0]))
