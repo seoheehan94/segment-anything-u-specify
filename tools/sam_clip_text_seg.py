@@ -109,15 +109,18 @@ def main():
 
     # Ensure image and mask are both uint8
     mask_2d = (ret['ins_seg_mask2'] == 1).astype(np.uint8)
-    binary_mask_rgb = np.stack([mask_2d]*3, axis=2)  # shape (H, W, 3)
+    # Expand to 3 channels if needed
+    if mask_2d.ndim == 2:
+        binary_mask = np.stack([mask_2d]*3, axis=2)  # (H, W, 3)
+    else:
+        binary_mask = mask_2d  # (H, W, 3)
 
-    # Apply mask to source image to keep only the foreground
-    source = ret['source']
-    if source.dtype != np.uint8:
-        source = source.astype(np.uint8)
-    assert source.ndim == 3 and source.shape[2] == 3, f"Expected (H, W, 3) image, got {source.shape}"
+    # Ensure image and mask are both uint8
+    source = ret['source'].astype(np.uint8)
+    binary_mask = binary_mask.astype(np.uint8)
 
-    foreground = source * binary_mask_rgb  # (H, W, 3)
+    # Mask the RGB image
+    foreground = source * binary_mask  # (H, W, 3)
 
     # Create alpha channel: 255 where mask==1, else 0
     alpha = (mask_2d * 255).astype(np.uint8)  # shape (H, W)
