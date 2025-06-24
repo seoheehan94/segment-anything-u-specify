@@ -88,16 +88,14 @@ def main():
 
     # === NEW: Save object on gray background ===
     # Create gray background same size as original image
-    mask_2d = ret['ins_seg_mask2'].astype(np.uint8)  # shape (H, W)
+    mask_2d = (ret['ins_seg_mask2'] != 0).astype(np.uint8)
     if mask_2d.ndim == 2:
         binary_mask = np.stack([mask_2d]*3, axis=2)
     else:
         binary_mask = mask_2d  # Already 3D
 
     binary_mask = 1 - binary_mask
-    unique_vals = np.unique(mask_2d)
-    print("Unique values in mask:", unique_vals)
-    
+
     gray_bg = np.full_like(ret['source'], fill_value=128)
 
     # Composite: keep foreground where mask==1, else gray background
@@ -105,7 +103,6 @@ def main():
     composite_image = composite_image.astype(np.uint8)
 
     # Save
-    cv2.imwrite(object_only_path, object_only)
     gray_output_path = ops.join(save_dir, '{:s}_object_on_gray.png'.format(input_image_name.split('.')[0]))
     cv2.imwrite(gray_output_path, composite_image)
 
