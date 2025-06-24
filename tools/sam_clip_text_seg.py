@@ -34,7 +34,7 @@ def init_args():
     parser.add_argument('--insseg_cfg_path', type=str, default='./config/insseg.yaml')
     parser.add_argument('--text', type=str, default=None)
     parser.add_argument('--cls_score_thresh', type=float, default=None)
-    parser.add_argument('--save_dir', type=str, default='/bwlab/Users/SeoheeHan/Curvature/THINGS/insseg')
+    parser.add_argument('--save_dir', type=str, default='/bwlab/Users/SeoheeHan/Curvature/THINGS/new_seg')
     parser.add_argument('--use_text_prefix', action='store_true')
 
     return parser.parse_args()
@@ -76,13 +76,16 @@ def main():
 
     # save cluster result
     save_dir = args.save_dir
+    if args.text:
+        subfolder_name = args.text.split(',')[0].strip()
+        save_dir = ops.join(save_dir, subfolder_name)
     os.makedirs(save_dir, exist_ok=True)
     ori_image_save_path = ops.join(save_dir, input_image_name)
-    cv2.imwrite(ori_image_save_path, ret['source'])
+    #cv2.imwrite(ori_image_save_path, ret['source'])
     mask_save_path = ops.join(save_dir, '{:s}_insseg_mask.png'.format(input_image_name.split('.')[0]))
-    cv2.imwrite(mask_save_path, ret['ins_seg_mask2'])
+    #cv2.imwrite(mask_save_path, ret['ins_seg_mask2'])
     mask_add_save_path = ops.join(save_dir, '{:s}_insseg_add.png'.format(input_image_name.split('.')[0]))
-    cv2.imwrite(mask_add_save_path, ret['ins_seg_add'])
+    #cv2.imwrite(mask_add_save_path, ret['ins_seg_add'])
     
     
 
