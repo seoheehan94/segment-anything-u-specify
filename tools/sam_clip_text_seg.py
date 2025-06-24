@@ -88,7 +88,7 @@ def main():
 
     # === NEW: Save object on gray background ===
     # Create gray background same size as original image
-    mask_2d = (ret['ins_seg_mask2'] == 19).astype(np.uint8)
+    mask_2d = (ret['ins_seg_mask2'] == 86).astype(np.uint8)
     if mask_2d.ndim == 2:
         binary_mask = np.stack([mask_2d]*3, axis=2)
     else:
