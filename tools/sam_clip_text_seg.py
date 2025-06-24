@@ -107,14 +107,22 @@ def main():
 
     LOG.info(f'Saved object-on-gray image to: {gray_output_path}')
 
+    # Ensure image and mask are both uint8
+    source = ret['source'].astype(np.uint8)
+    binary_mask = binary_mask.astype(np.uint8)
+
     # Apply mask to source image to keep only the foreground
-    foreground = ret['source'] * binary_mask  # (H, W, 3)
+    foreground = source * binary_mask  # (H, W, 3)
 
     # Create alpha channel: 255 where mask==1, else 0
     alpha = (mask_2d * 255).astype(np.uint8)  # shape (H, W)
 
     # Combine RGB and alpha into RGBA
     rgba_image = np.dstack((foreground, alpha))  # shape (H, W, 4)
+
+    # Check shape and dtype
+    assert rgba_image.ndim == 3 and rgba_image.shape[2] == 4, "RGBA image must have shape (H, W, 4)"
+    assert rgba_image.dtype == np.uint8, "Image must be uint8"
 
     # Save as PNG with transparency
     transparent_output_path = ops.join(save_dir, '{:s}_object_transparent.png'.format(input_image_name.split('.')[0]))
