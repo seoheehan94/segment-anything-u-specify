@@ -34,7 +34,7 @@ def init_args():
     parser.add_argument('--insseg_cfg_path', type=str, default='./config/insseg.yaml')
     parser.add_argument('--text', type=str, default=None)
     parser.add_argument('--cls_score_thresh', type=float, default=None)
-    parser.add_argument('--save_dir', type=str, default='./output/insseg')
+    parser.add_argument('--save_dir', type=str, default='/bwlab/Users/SeoheeHan/Curvature/THINGS/insseg')
     parser.add_argument('--use_text_prefix', action='store_true')
 
     return parser.parse_args()
@@ -104,7 +104,8 @@ def main():
 
     # Save
     object_only = ret['source'] * binary_mask
-    cv2.imwrite('debug_object_only.png', object_only)
+    object_only_path = ops.join(save_dir, '{:s}_debug_object_only.png'.format(input_image_name.split('.')[0]))
+    cv2.imwrite(object_only_path, object_only)
     gray_output_path = ops.join(save_dir, '{:s}_object_on_gray.png'.format(input_image_name.split('.')[0]))
     cv2.imwrite(gray_output_path, composite_image)
 
