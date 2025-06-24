@@ -1,23 +1,29 @@
 #!/bin/bash
 
-# Base directory containing category subfolders
+# Base directory of category subfolders
 BASE_DIR="/bwdata/THINGS"
 
-# Loop through each category folder
+# Destination base directory for output
+SAVE_BASE="/bwlab/Users/SeoheeHan/Curvature/THINGS/new_seg"
+
 for CATEGORY_DIR in "$BASE_DIR"/*/; do
-    # Get category name (e.g., 'acorn')
     CATEGORY_NAME=$(basename "$CATEGORY_DIR")
 
-    # Loop through each image in the category folder
     for IMAGE_PATH in "$CATEGORY_DIR"*.jpg; do
-        # Skip if no .jpg files are found
-        [ -e "$IMAGE_PATH" ] || continue
+        [ -e "$IMAGE_PATH" ] || continue  # Skip if no jpg
 
-        echo "Processing $IMAGE_PATH with text prompt: $CATEGORY_NAME"
+        IMAGE_NAME=$(basename "$IMAGE_PATH" .jpg)
+        OUTPUT_DIR="${SAVE_BASE}/${CATEGORY_NAME}"
+        OUTPUT_FILE="${OUTPUT_DIR}/${IMAGE_NAME}_object_transparent.png"
 
-        python tools/sam_clip_text_seg.py \
-            --input_image_path "$IMAGE_PATH" \
-            --text "$CATEGORY_NAME"
+        if [ ! -f "$OUTPUT_FILE" ]; then
+            echo "Processing $IMAGE_PATH (text: $CATEGORY_NAME)"
+            python tools/sam_clip_text_seg.py \
+                --input_image_path "$IMAGE_PATH" \
+                --text "$CATEGORY_NAME"
+        else
+            echo "Skipping $IMAGE_PATH — already processed"
+        fi
     done
 done
 
