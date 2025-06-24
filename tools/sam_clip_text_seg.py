@@ -113,9 +113,9 @@ def main():
     if mask_2d.ndim == 3:
         mask_2d = mask_2d[:, :, 0]  # take only one channel
     mask_2d = (mask_2d == 1).astype(np.uint8)  # (H, W)
-    
+    mask_2d = 1 - mask_2d
+
     binary_mask = np.stack([mask_2d]*3, axis=2)  # (H, W, 3)
-    binary_mask = 1 - binary_mask
 
     # Ensure image and mask are both uint8
     source = ret['source'].astype(np.uint8)
