@@ -115,6 +115,7 @@ def main():
     mask_2d = (mask_2d == 1).astype(np.uint8)  # (H, W)
     
     binary_mask = np.stack([mask_2d]*3, axis=2)  # (H, W, 3)
+    binary_mask = 1 - binary_mask
 
     # Ensure image and mask are both uint8
     source = ret['source'].astype(np.uint8)
