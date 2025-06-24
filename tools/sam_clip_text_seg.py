@@ -112,7 +112,12 @@ def main():
     binary_mask_rgb = np.stack([mask_2d]*3, axis=2)  # shape (H, W, 3)
 
     # Apply mask to source image to keep only the foreground
-    foreground = ret['source'] * binary_mask_rgb  # (H, W, 3)
+    source = ret['source']
+    if source.dtype != np.uint8:
+        source = source.astype(np.uint8)
+    assert source.ndim == 3 and source.shape[2] == 3, f"Expected (H, W, 3) image, got {source.shape}"
+
+    foreground = source * binary_mask_rgb  # (H, W, 3)
 
     # Create alpha channel: 255 where mask==1, else 0
     alpha = (mask_2d * 255).astype(np.uint8)  # shape (H, W)
@@ -120,7 +125,7 @@ def main():
     # Combine RGB and alpha into RGBA
     rgba_image = np.dstack((foreground, alpha))  # shape (H, W, 4)
 
-    print("source shape:", ret['source'].shape)
+    print("source shape:", source.shape)
     print("mask_2d shape:", mask_2d.shape)
     print("binary_mask_rgb shape:", binary_mask_rgb.shape)
     print("foreground shape:", foreground.shape)
