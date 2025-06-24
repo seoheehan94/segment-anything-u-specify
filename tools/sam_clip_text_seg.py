@@ -130,7 +130,7 @@ def main():
 
     print("source shape:", source.shape)
     print("mask_2d shape:", mask_2d.shape)
-    print("binary_mask_rgb shape:", binary_mask_rgb.shape)
+    print("binary_mask shape:", binary_mask.shape)
     print("foreground shape:", foreground.shape)
     print("alpha shape:", alpha.shape)
     print("rgba_image shape:", rgba_image.shape)
