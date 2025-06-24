@@ -4,7 +4,7 @@
 BASE_DIR="/bwdata/THINGS"
 
 # Destination base directory for output
-SAVE_BASE="/bwlab/Users/SeoheeHan/Curvature/THINGS/new_seg"
+SAVE_BASE="/bwdata/THINGS_segmented"
 
 for CATEGORY_DIR in "$BASE_DIR"/*/; do
     CATEGORY_NAME=$(basename "$CATEGORY_DIR")
