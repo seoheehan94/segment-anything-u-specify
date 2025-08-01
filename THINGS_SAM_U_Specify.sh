@@ -15,7 +15,6 @@ for CATEGORY_DIR in "$BASE_DIR"/*/; do
         IMAGE_NAME=$(basename "$IMAGE_PATH" .jpg)
         OUTPUT_DIR="${SAVE_BASE}/${CATEGORY_NAME}"
         OUTPUT_FILE="${OUTPUT_DIR}/${IMAGE_NAME}_object_transparent.png"
-        echo"$OUTPUT_FILE"
 
         if [ ! -f "$OUTPUT_FILE" ]; then
             echo "Processing $IMAGE_PATH (text: $CATEGORY_NAME)"
