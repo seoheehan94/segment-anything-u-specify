@@ -20,6 +20,12 @@ from models import build_sam_clip_text_ins_segmentor
 
 from PIL import Image
 import numpy as np
+
+import torch
+torch.cuda.empty_cache()
+#device =torch.device("cpu")
+#model.to(device)
+#input_tensor - input_tensor.to(device)
     
 LOG = init_logger.get_logger('instance_seg.log')
 
